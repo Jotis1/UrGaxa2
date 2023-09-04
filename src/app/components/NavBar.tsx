@@ -3,12 +3,12 @@ export default function NavBar() {
         <nav className="h-[60px] bg-slate-100 flex items-center justify-between px-10">
             <section className="flex items-center">
                 {/** YORU BRAND */}
-                <a href="../" className="text-2xl font-black text-slate-950">
+                <a href="https://jotis1.github.io/UrGaxa2" className="text-2xl font-black text-slate-950">
                     YORU <span className="text-xs font-bold">for ANI<span className="text-blue-700">LIST</span></span>
                 </a>
                 {/** BUTTONS */}
                 <section className="ml-8 text-xs text-slate-950 flex">
-                    <a href="../" className="block relative group min-w-[50px] text-center mx-2">
+                    <a href="https://jotis1.github.io/UrGaxa2" className="block relative group min-w-[50px] text-center mx-2">
                         Gacha
                         <span className="absolute w-0 group-hover:w-full transition-all h-[2px] bg-slate-950 -bottom-[5px] left-0"></span>
                     </a>
