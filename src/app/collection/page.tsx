@@ -2,18 +2,7 @@
 
 import { useState, useEffect } from "react";
 import NavBar from "../components/NavBar";
-import CardComponent from "../components/CardComponent";
-type CardData = {
-    name: {
-        userPreferred: string;
-    };
-    favourites: number;
-    image: {
-        large: string
-    };
-    id: number
-    // Otros campos de datos de tarjeta
-};
+import Card from "../components/Card";
 export default function Collection() {
     const [cardComponents, setCardComponents] = useState<JSX.Element[]>([]);
     function getAllIDs() {
@@ -22,9 +11,8 @@ export default function Collection() {
         if (!array) return [];
     }
     async function getCharactersArray() {
-        const databaseURL = "https://y-anime.europe-west1.firebasedatabase.app/";
+        const databaseURL = "https://y-anime.europe-west1.firebasedatabase.app";
         const ids = getAllIDs();
-
         if (!ids || ids.length === 0) {
             // Si no hay IDs o la matriz está vacía, simplemente retorna un array vacío
             return [];
@@ -48,18 +36,19 @@ export default function Collection() {
 
         // Espera a que todas las promesas se resuelvan
         const results = await Promise.all(fetchPromises);
-
         // Filtra los resultados para eliminar los valores nulos (errores)
         const validResults = results.filter((result) => result !== null);
-
         return validResults; // Retorna los datos válidos como un array
     }
     useEffect(() => {
         async function fetchData() {
             const cardData = await getCharactersArray();
+            console.log(cardData)
             const cardComponentsData = cardData.map((data, index) => (
-                <CardComponent
+                <Card
                     image={data.image.large}
+                    gender={data.gender}
+                    anime={data.anime.full}
                     index={index}
                     currentCard={-1}
                     id={data.id}
