@@ -33,18 +33,19 @@ export default function Home() {
   const [isVisible, setIsVisible] = useState(true);
   const [areItemsVisible, setAreItemsVisible] = useState(false);
   const [currentCard, setCurrentCard] = useState(1);
-  const [cardsData, setCardsData] = useState<CardData[]>([]); // Estado para almacenar los datos de las cartas
-  function getRandomElements<T>(array: T[], numElements: number): T[] {
-    const shuffledArray = array.slice(); // Clona el array original
-    for (let i = shuffledArray.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]];
-    }
-    return shuffledArray.slice(0, numElements);
+  const [cardsData, setCardsData] = useState<CardData[]>([]);
+  const [status, setStatus] = useState(0);
+
+  function obtenerNumeroAleatorio() {
+    const min = 1;
+    const max = 313506;
+    const numeroAleatorio = Math.floor(Math.random() * (max - min + 1)) + min;
+    return numeroAleatorio;
   }
+  let randomData: any = [];
   async function getCharactersArray() {
     const databaseURL = "https://y-anime.europe-west1.firebasedatabase.app/";
-    const arrayEndpoint = ".json";
+    const arrayEndpoint = `${obtenerNumeroAleatorio()}.json`;
     try {
       const response = await fetch(`${databaseURL}/${arrayEndpoint}`);
       if (!response.ok) {
@@ -52,12 +53,15 @@ export default function Home() {
       }
       const data = await response.json();
       if (data) {
-        const dataArray = Object.values(data);
-
-        const randomData = getRandomElements(dataArray, 10);
+        randomData.push(data);
+        console.log(randomData.length)
+        setStatus(randomData.length);
+        if (randomData.length !== 10) {
+          await getCharactersArray();
+        }
         return randomData;
       } else {
-        console.log("No se encontraron datos en el array.");
+        await getCharactersArray();
       }
     } catch (error) {
       console.error("Error al obtener los datos:", error);
@@ -92,6 +96,13 @@ export default function Home() {
     <main>
       <NavBar />
       <section className="w-full h-[calc(100vh-60px)] flex justify-center items-center">
+        {status != 0 && (
+          <span className={`${status == 10 ? "hidden" : "block"} absolute top-[80px] bg-slate-200 w-[400px] h-4 rounded-md overflow-hidden`}>
+            <div className="relative w-full h-full">
+              <span className={`${status == 10 ? "hidden" : "block"} h-full bg-green-200`} style={{ width: `${status * 10}%` }}></span>
+            </div>
+          </span>
+        )}
         <AnimatePresence>
           {isVisible && (
             <motion.section
