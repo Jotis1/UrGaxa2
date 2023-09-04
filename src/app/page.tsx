@@ -83,13 +83,12 @@ export default function Home() {
   };
   const handleClick = () => {
     getCharactersArray().then((data: any) => {
-      if (data) {
-        setCardsData(data);
-        setIsVisible(!isVisible);
-        setTimeout(() => {
-          setAreItemsVisible(true);
-        }, 300);
-      }
+      setCardsData(data);
+      setIsVisible(!isVisible);
+      setTimeout(() => {
+        setAreItemsVisible(true);
+      }, 300);
+
     });
   };
   return (
