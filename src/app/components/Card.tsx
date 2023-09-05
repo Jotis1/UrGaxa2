@@ -38,6 +38,9 @@ export default function Card({ name, favourites, index, currentCard, image, id, 
         bg = "border-slate-100"
     }
     const handleHeartClick = () => {
+        if (currentCard != -1) {
+
+        }
         const favoritos = JSON.parse(localStorage.getItem('favoritos') || '[]');
         favoritos.push(id);
         localStorage.setItem('favoritos', JSON.stringify(favoritos));
