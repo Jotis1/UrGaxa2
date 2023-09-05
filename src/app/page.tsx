@@ -182,7 +182,7 @@ export default function Home() {
               cardContent.map((character: CharacterData, index) => (
                 <section key={index}>
                   <Card
-                    anime={character.anime.title.romaji}
+                    anime={character.anime && character.anime.title ? character.anime.title.romaji : 'Título no disponible'}
                     id={character.id}
                     gender={character.gender}
                     image={character.image.large}

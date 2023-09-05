@@ -6,7 +6,7 @@ interface CardComponentProps {
     currentCard: number;
     image: string;
     id: number;
-    anime: string;
+    anime?: string;
     gender: string
 }
 
