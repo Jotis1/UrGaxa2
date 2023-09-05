@@ -48,12 +48,12 @@ export default function Collection() {
                 <Card
                     image={data.image.large}
                     gender={data.gender}
-                    anime={data.anime.full}
+                    anime={data.anime.title.romaji}
                     index={index}
                     currentCard={-1}
                     id={data.id}
                     key={index}
-                    name={data.name.userPreferred}
+                    name={data.name.full}
                     favourites={data.favourites}
                 // otros props de acuerdo a la estructura de tu objeto
                 />
