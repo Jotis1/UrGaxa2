@@ -43,7 +43,18 @@ export default function Collection() {
     useEffect(() => {
         async function fetchData() {
             const cardData = await getCharactersArray();
-            console.log(cardData)
+            console.log(cardData);
+            // Supongamos que cardData es tu array de objetos
+
+            // Ordena cardData por el atributo 'favourites' de manera ascendente (de menor a mayor)
+            // Supongamos que cardData es tu array de objetos
+
+            // Ordena cardData por el atributo 'favourites' de manera descendente (de mayor a menor)
+            cardData.sort((a, b) => b.favourites - a.favourites);
+
+            // Si deseas ordenar de manera descendente (de mayor a menor), puedes hacerlo así:
+            // cardData.sort((a, b) => b.favourites - a.favourites);
+
             const cardComponentsData = cardData.map((data, index) => (
                 <Card
                     image={data.image.large}
