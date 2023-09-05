@@ -254,7 +254,9 @@ export default function Home() {
           </div>
         </section>
       </section >) : (
-        <p>Debes iniciar sesión para poder jugar</p>
+        <section className="text-slate-950 text-center w-[100vw] h-[calc(100vh_-_60px)] flex justify-center items-center">
+          <p className="text-4xl font-black">Debes iniciar sesión para poder jugar</p>
+        </section>
       )}
     </main >
   )
