@@ -162,9 +162,9 @@ export default function Home() {
     <main>
       <NavBar></NavBar>
       <section className="relative w-full h-[calc(100vh_-_60px)] overflow-auto ">
-        <span className={`${status == 0 ? "hidden" : "block"} ${status >= 10 ? "hidden" : "block"} absolute w-[300px] h-4 bg-slate-200 left-1/2 -translate-x-1/2 top-10 rounded-md overflow-hidden`}>
-          <div className={`w-[${(status) * 10}%] bg-blue-500 h-full transition-all`}></div>
-        </span>
+        <div className={`${status == 10 ? "hidden" : "flex"} ${status == 0 ? "hidden" : "flex"} absolute left-1/2 -translate-x-1/2 justify-center py-10`}>
+          <progress className="w-[300px] relative rounded-lg bg-slate-100 appearance-none" max={100} value={status * 10}></progress>
+        </div>
         <span className={`${isVisible ? "block" : "hidden"} absolute left-5 px-4 py-2 bg-slate-950 rounded-md top-5 text-white text-xs`}>
           {currentCard + 1}/10 cartas
         </span>

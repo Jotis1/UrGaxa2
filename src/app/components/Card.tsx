@@ -43,8 +43,6 @@ export default function Card({ name, favourites, index, currentCard, image, id, 
         alert('Personaje añadido a favoritos.');
     }
 
-    console.log(anime)
-
     return (
         <section className={`${currentCard == -1 ? "relative" : "absolute"} ${isHidden} w-[300px]  h-[500px] bg-slate-100 rounded-md p-3 shadow-lg ${shadow} border-4 ${bg}  text-slate-950`}>
             <div className="w-full aspect-square bg-slate-200 rounded-md bg-cover bg-image bg-center" style={{ backgroundImage: `url(${image})` }}></div>
