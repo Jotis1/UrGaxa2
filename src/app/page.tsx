@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { UserAuth } from "./context/AuthContext";
 import Card from "./components/Card";
-import NavBar from "./components/NavBar";
+import { onValue, ref } from "firebase/database";
 
 interface CharacterData {
   anime: {
@@ -22,6 +23,8 @@ interface CharacterData {
 }
 
 export default function Home() {
+  const { user, rtdb, getUserData } = UserAuth();
+  const [data, setData] = useState(null);
   const [currentCard, setCurrentCard] = useState(0);
   const [isBlocked, setIsBlocked] = useState(false);
   const [status, setStatus] = useState(0);
@@ -38,10 +41,20 @@ export default function Home() {
     return randomNumberArray;
   };
 
-  function fetchCharacter(e: any) {
-    return fetch(`https://this-is-yoru-default-rtdb.europe-west1.firebasedatabase.app//${e}.json`)
-      .then(response => response.json());
-  };
+  async function fetchCharacter(e: number) {
+    return new Promise((resolve, reject) => {
+      const charRef = ref(rtdb, String(e));
+      onValue(charRef, (snap) => {
+        if (snap.exists()) {
+          let data = snap.val();
+          console.log(data)
+          resolve(data);
+        } else {
+          reject(new Error(`No se encontraron datos para el personaje ${e}.`));
+        }
+      });
+    });
+  }
 
   function waitForTenCharacters() {
     return new Promise(async (resolve, reject) => {
@@ -70,23 +83,17 @@ export default function Home() {
 
   const [isVisible, setIsVisible] = useState(false);
   const [cardContent, setCardContent] = useState([]);
-  const [sobres, setSobres] = useState(Number);
 
   useEffect(() => {
-    // Define la función getPastOpened
-    function getPastOpened() {
-      var opened = Number(localStorage.getItem("sobresTirados")) || 0;
-
-      if (opened === 0) {
-        localStorage.setItem("sobresTirados", "0");
-      }
-
-      setSobres(opened);
+    const checkAuth = async () => {
+      await new Promise((res) => {
+        setTimeout(res, 50);
+        setLoading(false)
+      })
     }
-
-    // Llama a getPastOpened una vez cuando el componente se monta
-    getPastOpened();
-  }, []);
+    getUserData().then((res: any) => setData(res));
+    checkAuth();
+  }, [user])
 
   const handleClick = async () => {
     if (!isBlocked) {
@@ -94,10 +101,7 @@ export default function Home() {
       waitForTenCharacters().then((char: any) => {
         setIsVisible(true);
         setCardContent(char);
-        const sobresEnLocalStorage = Number(localStorage.getItem("sobresTirados")) || 0;
-        localStorage.setItem("sobresTirados", (sobresEnLocalStorage + 1).toString());
 
-        setSobres(sobresEnLocalStorage + 1);
       })
     }
   };
@@ -124,9 +128,31 @@ export default function Home() {
     setDumbAlert(false);
   };
 
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      await new Promise((res) => {
+        setTimeout(res, 50);
+        setLoading(false)
+      })
+    }
+    checkAuth();
+  }, [user]);
+
   return (
     <main>
-      <section className="relative w-full h-[calc(100vh_-_60px)] overflow-auto ">
+      {loading ? (
+        <section className="absolute w-[100vw] h-[calc(100vh_-_60px)] flex justify-center items-center">
+          <div role="status">
+            <svg aria-hidden="true" className="w-8 h-8 mr-2 text-slate-200 animate-spin  fill-pink-500" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor" />
+              <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill" />
+            </svg>
+            <span className="sr-only">Loading...</span>
+          </div>
+        </section>
+      ) : user ? (<section className="relative w-full h-[calc(100vh_-_60px)] overflow-auto ">
         <div className={`${status == 10 ? "hidden" : "flex"} ${status == 0 ? "hidden" : "flex"} bg-slate-100 h-[20px] rounded-xl overflow-hidden absolute left-1/2 -translate-x-1/2 justify-center my-10`}>
           <progress className="w-[300px] h-[20px] relative rounded-lg bg-slate-100 appearance-none" max={100} value={status * 10}></progress>
         </div>
@@ -134,7 +160,7 @@ export default function Home() {
           {currentCard + 1}/10 cartas
         </span>
         <span className={`block absolute right-5 px-4 py-2 bg-slate-950 rounded-md top-5 text-white text-xs`}>
-          {sobres} sobres abiertos
+          {data ? data.packsOpened : "0"} sobres abiertos
         </span>
         <section className={`${isVisible ? "hidden" : "flex"} w-full h-[calc(100vh_-_60px)] justify-center items-center`}>
           <button className={`group relative w-[300px] overflow-hidden h-[500px] bg-image bg-cover bg-center m-10 hover:scale-105 rounded-md transition-all`} style={{ backgroundSize: "100%", backgroundImage: "url(https://cdn.discordapp.com/attachments/756552573431054508/1148384635101909012/Standard_Pack.png)" }} onClick={handleClick}>
@@ -184,7 +210,10 @@ export default function Home() {
             </div>
           </div>
         </section>
-      </section >
+      </section >) : (
+        <p>Debes iniciar sesión para poder jugar</p>
+      )}
+
     </main >
   )
 }
