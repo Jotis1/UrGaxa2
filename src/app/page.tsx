@@ -22,9 +22,29 @@ interface CharacterData {
   favourites: number;
 }
 
+interface UserData {
+  username: string;
+  profilePicture: string;
+  acquiredCharacters: number[];
+  packsOpened: number;
+  uid: string;
+  score: number;
+  level: number;
+  achievements: any[]; // Puedes definir una interfaz específica si es necesario
+  virtualCurrency: number;
+  registrationDate: string; // O puede ser un objeto Date si lo prefieres
+  userStatus: string; // Puedes definir un conjunto de valores permitidos si es finito
+  transactionHistory: any[]; // Puedes definir una interfaz específica si es necesario
+  gamePreferences: {
+    language: string;
+    notificationsEnabled: boolean;
+    soundVolume: number;
+  };
+}
+
 export default function Home() {
   const { user, rtdb, getUserData } = UserAuth();
-  const [data, setData] = useState(null);
+  const [data, setData] = useState<UserData | null>(null);
   const [currentCard, setCurrentCard] = useState(0);
   const [isBlocked, setIsBlocked] = useState(false);
   const [status, setStatus] = useState(0);
