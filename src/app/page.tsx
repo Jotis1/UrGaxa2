@@ -127,8 +127,8 @@ export default function Home() {
   return (
     <main>
       <section className="relative w-full h-[calc(100vh_-_60px)] overflow-auto ">
-        <div className={`${status == 10 ? "hidden" : "flex"} ${status == 0 ? "hidden" : "flex"} rounded-lg overflow-hidden absolute left-1/2 -translate-x-1/2 justify-center py-10`}>
-          <progress className="w-[300px] relative rounded-lg bg-slate-100 appearance-none" max={100} value={status * 10}></progress>
+        <div className={`${status == 10 ? "hidden" : "flex"} ${status == 0 ? "hidden" : "flex"} bg-slate-100 h-[20px] rounded-xl overflow-hidden absolute left-1/2 -translate-x-1/2 justify-center my-10`}>
+          <progress className="w-[300px] h-[20px] relative rounded-lg bg-slate-100 appearance-none" max={100} value={status * 10}></progress>
         </div>
         <span className={`${isVisible ? "block" : "hidden"} absolute left-5 px-4 py-2 bg-slate-950 rounded-md top-5 text-white text-xs`}>
           {currentCard + 1}/10 cartas
