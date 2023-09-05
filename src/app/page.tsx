@@ -39,7 +39,7 @@ export default function Home() {
   };
 
   function fetchCharacter(e: any) {
-    return fetch(`https://y-anime.europe-west1.firebasedatabase.app/${e}.json`)
+    return fetch(`https://this-is-yoru-default-rtdb.europe-west1.firebasedatabase.app//${e}.json`)
       .then(response => response.json());
   };
 
