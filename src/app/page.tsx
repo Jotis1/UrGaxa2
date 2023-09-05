@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Card from "./components/Card";
 import NavBar from "./components/NavBar";
-// Define una interfaz que represente el tipo de tus datos
+
 interface CharacterData {
   anime: {
     title: {
@@ -11,7 +11,7 @@ interface CharacterData {
     };
   };
   id: number;
-  gender: string; // Asegúrate de que esta propiedad esté definida correctamente
+  gender: string;
   image: {
     large: string;
   };
@@ -20,8 +20,6 @@ interface CharacterData {
   };
   favourites: number;
 }
-
-// Ahora TypeScript sabrá que character tiene la propiedad 'gender'
 
 export default function Home() {
   const [currentCard, setCurrentCard] = useState(0);
@@ -38,12 +36,12 @@ export default function Home() {
       randomNumberArray.push(randomNumber);
     }
     return randomNumberArray;
-  }
+  };
 
   function fetchCharacter(e: any) {
     return fetch(`https://y-anime.europe-west1.firebasedatabase.app/${e}.json`)
       .then(response => response.json());
-  }
+  };
 
   function waitForTenCharacters() {
     return new Promise(async (resolve, reject) => {
@@ -68,39 +66,7 @@ export default function Home() {
       // Si no se alcanzan 10 personajes, rechazamos la Promise.
       reject(new Error('No se pudieron obtener 10 personajes.'));
     });
-  }
-
-  let i = 0;
-
-  /*function waitForTenCharacters() {
-    return new Promise(async (resolve, reject) => {
-      const charactersArray = [];
-      const maxCharacters = 10;
-
-      while (charactersArray.length < maxCharacters) {
-        try {
-          const e = Math.floor(Math.random() * (max - min + 1)) + min;
-          const char = await fetchCharacter(e);
-          console.log(char.favourites);
-          console.log(i++);
-          if (char.favourites > 1000) {
-            charactersArray.push(char);
-          }
-
-          setStatus(charactersArray.length);
-        } catch (error) {
-          console.error(`Error al obtener un personaje:`, error);
-          // Puedes manejar el error de manera apropiada
-        }
-      }
-
-      if (charactersArray.length >= maxCharacters) {
-        resolve(charactersArray.slice(0, maxCharacters));
-      } else {
-        reject(new Error('No se pudieron obtener 10 personajes con char.favorite > 1000.'));
-      }
-    });
-  }*/
+  };
 
   const [isVisible, setIsVisible] = useState(false);
   const [cardContent, setCardContent] = useState([]);
@@ -134,7 +100,7 @@ export default function Home() {
         setSobres(sobresEnLocalStorage + 1);
       })
     }
-  }
+  };
 
   const handlePrevClick = () => {
     if (currentCard != 0) {
@@ -160,9 +126,8 @@ export default function Home() {
 
   return (
     <main>
-      <NavBar></NavBar>
       <section className="relative w-full h-[calc(100vh_-_60px)] overflow-auto ">
-        <div className={`${status == 10 ? "hidden" : "flex"} ${status == 0 ? "hidden" : "flex"} absolute left-1/2 -translate-x-1/2 justify-center py-10`}>
+        <div className={`${status == 10 ? "hidden" : "flex"} ${status == 0 ? "hidden" : "flex"} rounded-lg overflow-hidden absolute left-1/2 -translate-x-1/2 justify-center py-10`}>
           <progress className="w-[300px] relative rounded-lg bg-slate-100 appearance-none" max={100} value={status * 10}></progress>
         </div>
         <span className={`${isVisible ? "block" : "hidden"} absolute left-5 px-4 py-2 bg-slate-950 rounded-md top-5 text-white text-xs`}>

@@ -66,7 +66,6 @@ export default function Collection() {
 
     return (
         <main>
-            <NavBar></NavBar>
             <section>
                 <p className="m-5 text-3xl font-extrabold text-slate-950">Colección</p>
                 <section className="w-[1328px] flex flex-wrap justify-start mx-auto">

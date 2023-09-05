@@ -1,40 +1,55 @@
+import Link from "next/link";
+import { UserAuth } from "../context/AuthContext";
+
 export default function NavBar() {
+    const { user, googleSignIn, logOut } = UserAuth();
+
+    const handleSignIn = async () => {
+        try {
+            await googleSignIn();
+        } catch (error) {
+            console.log(error);
+        }
+    }
+    console.log(user);
     return (
         <nav className="h-[60px] bg-slate-100 flex items-center justify-between px-10">
             <section className="flex items-center">
                 {/** YORU BRAND */}
-                <a href="https://jotis1.github.io/UrGaxa2" className="text-2xl font-black text-slate-950">
+                <Link href="/" className="text-2xl font-black text-slate-950">
                     YORU <span className="text-xs font-bold">for ANI<span className="text-blue-700">LIST</span></span>
-                </a>
+                </Link>
                 {/** BUTTONS */}
                 <section className="ml-8 text-xs text-slate-950 flex">
-                    <a href="https://jotis1.github.io/UrGaxa2" className="block relative group min-w-[50px] text-center mx-2">
-                        Gacha
+                    <Link href="/" className="block relative group min-w-[50px] text-center mx-2">Gacha
                         <span className="absolute w-0 group-hover:w-full transition-all h-[2px] bg-slate-950 -bottom-[5px] left-0"></span>
-                    </a>
-                    <a href="#!" className="block relative group min-w-[50px] text-center mx-2">
+                    </Link>
+                    <Link href="#!" className="block relative group min-w-[50px] text-center mx-2">
                         Tienda
                         <span className="absolute w-0 group-hover:w-full transition-all h-[2px] bg-slate-950 -bottom-[5px] left-0"></span>
-                    </a>
-                    <a href="./collection" className="block relative group min-w-[50px] text-center mx-2">
+                    </Link>
+                    <Link href="/collection" className="block relative group min-w-[50px] text-center mx-2">
                         Colección
                         <span className="absolute w-0 group-hover:w-full transition-all h-[2px] bg-slate-950 -bottom-[5px] left-0"></span>
-                    </a>
-                    <a href="#!" className="block relative group min-w-[50px] text-center mx-2">
+                    </Link>
+                    <Link href="#!" className="block relative group min-w-[50px] text-center mx-2">
                         Foro
                         <span className="absolute w-0 group-hover:w-full transition-all h-[2px] bg-slate-950 -bottom-[5px] left-0"></span>
-                    </a>
-                    <a href="#!" className="block relative group min-w-[50px] text-center mx-2">
+                    </Link>
+                    <Link href="#!" className="block relative group min-w-[50px] text-center mx-2">
                         Noticias
                         <span className="absolute w-0 group-hover:w-full transition-all h-[2px] bg-slate-950 -bottom-[5px] left-0"></span>
-                    </a>
-                    <a href="#!" className="block relative group min-w-[50px] text-center mx-2">
+                    </Link>
+                    <Link href="#!" className="block relative group min-w-[50px] text-center mx-2">
                         FAQ
                         <span className="absolute w-0 group-hover:w-full transition-all h-[2px] bg-slate-950 -bottom-[5px] left-0"></span>
-                    </a>
+                    </Link>
                 </section>
             </section>
-            <section className="relative">
+            <section>
+                <button className="bg-slate-200 px-4 py-2 rounded-md text-xs hover:scale-105 transition-all shadow-md" onClick={handleSignIn}>Iniciar sesión</button>
+            </section>
+            <section className="relative hidden">
                 <button className="h-[40px] aspect-square bg-slate-200 rounded-full"></button>
                 <section className="text-slate-950 flex-col absolute rounded-md mt-[15px] right-0 w-[200px] bg-slate-100 text-sm hidden">
                     <div className="p-4 bg-slate-50 rounded-t-md relative">
