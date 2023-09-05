@@ -1,6 +1,6 @@
 import { useContext, createContext, useState, useEffect } from "react";
 import { signInWithPopup, signOut, onAuthStateChanged, GoogleAuthProvider } from "firebase/auth";
-import { doc, setDoc, getDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc, updateDoc, arrayUnion, increment, onSnapshot } from "firebase/firestore";
 import { ref, get, onValue } from "firebase/database"
 import { auth, fsdb, rtdb } from "../firebase";
 
@@ -38,7 +38,7 @@ export const AuthContextProvider = ({ children }) => {
                             notificationsEnabled: true,
                             soundVolume: 1
                         }
-                    }).then(console.log("Done"))
+                    })
                 }
             }
         });
@@ -61,6 +61,79 @@ export const AuthContextProvider = ({ children }) => {
         }
     }
 
+    const addCharacter = async (e) => {
+        const userDoc = doc(fsdb, `users/${user.uid}`);
+        updateDoc(userDoc, {
+            acquiredCharacters: arrayUnion(e)
+        })
+    }
+
+    const addCharacterToHistory = async (char, p) => {
+        const userDoc = doc(fsdb, `users/${user.uid}`);
+        updateDoc(userDoc, {
+            history: arrayUnion({
+                pack: p,
+                character: char
+            })
+        })
+    }
+
+    const getTotalPacksOpened = async () => {
+        return new Promise((resolve, reject) => {
+            const statsDoc = doc(fsdb, `stats/packs`);
+            onSnapshot(statsDoc, (doc) => {
+                if (doc.exists()) {
+                    const data = doc.data();
+                    resolve(data.packsOpened);
+                } else {
+                    reject(new Error('El documento no existe.'));
+                }
+            });
+        });
+    };
+
+
+    const checkHistory = async (char, p) => {
+        const userDoc = doc(fsdb, `users/${user.uid}`);
+        const docSnap = await getDoc(userDoc);
+
+        if (docSnap.exists()) {
+            const data = docSnap.data();
+            const history = data.history;
+            history.forEach(e => {
+                console.log(e.pack, p)
+                if (e.character == char) {
+                    if (e.pack == p) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }
+            });
+        } else {
+            return null;
+        }
+
+    }
+
+    const addCoins = async (e) => {
+        const userDoc = doc(fsdb, `users/${user.uid}`);
+        updateDoc(userDoc, {
+            virtualCurrency: increment(e)
+        })
+    }
+
+    const addPack = async (e) => {
+        const userDoc = doc(fsdb, `users/${user.uid}`);
+        const statsDoc = doc(fsdb, `stats/packs`);
+        updateDoc(userDoc, {
+            packsOpened: increment(1)
+        })
+        updateDoc(statsDoc, {
+            packsOpened: increment(1)
+        })
+    }
+
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
             setUser(currentUser);
@@ -68,7 +141,7 @@ export const AuthContextProvider = ({ children }) => {
         return () => unsubscribe()
     }, [user])
 
-    return (<AuthContext.Provider value={{ user, googleSignIn, logOut, getUserData, rtdb }}>{children}</AuthContext.Provider>);
+    return (<AuthContext.Provider value={{ user, googleSignIn, logOut, getUserData, rtdb, fsdb, addCharacter, addCoins, addCharacterToHistory, checkHistory, addPack, getTotalPacksOpened }}>{children}</AuthContext.Provider>);
 }
 
 export const UserAuth = () => {

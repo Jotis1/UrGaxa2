@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { onSnapshot, doc } from "firebase/firestore";
 import { UserAuth } from "./context/AuthContext";
 import Card from "./components/Card";
 import { onValue, ref } from "firebase/database";
@@ -43,7 +44,7 @@ interface UserData {
 }
 
 export default function Home() {
-  const { user, rtdb, getUserData } = UserAuth();
+  const { user, rtdb, getUserData, addPack, fsdb } = UserAuth();
   const [data, setData] = useState<UserData | null>(null);
   const [currentCard, setCurrentCard] = useState(0);
   const [isBlocked, setIsBlocked] = useState(false);
@@ -67,7 +68,6 @@ export default function Home() {
       onValue(charRef, (snap) => {
         if (snap.exists()) {
           let data = snap.val();
-          console.log(data)
           resolve(data);
         } else {
           reject(new Error(`No se encontraron datos para el personaje ${e}.`));
@@ -103,6 +103,19 @@ export default function Home() {
 
   const [isVisible, setIsVisible] = useState(false);
   const [cardContent, setCardContent] = useState([]);
+  const [packsOp, setPacksOp] = useState(0);
+  const [totalPacksOp, setTotalPacksOp] = useState(0);
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(doc(fsdb, `stats/packs`), (doc) => {
+      if (doc.exists()) {
+        const data = doc.data();
+        setTotalPacksOp(data.packsOpened);
+      }
+    });
+    // Devolvemos una función de limpieza para detener la suscripción cuando el componente se desmonta.
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -111,7 +124,12 @@ export default function Home() {
         setLoading(false)
       })
     }
-    getUserData().then((res: any) => setData(res));
+    getUserData().then((res: any) => {
+      if (res) {
+        setData(res);
+        setPacksOp(res.packsOpened);
+      }
+    });
     checkAuth();
   }, [user])
 
@@ -121,7 +139,8 @@ export default function Home() {
       waitForTenCharacters().then((char: any) => {
         setIsVisible(true);
         setCardContent(char);
-
+        addPack();
+        setPacksOp((p) => p + 1)
       })
     }
   };
@@ -180,7 +199,10 @@ export default function Home() {
           {currentCard + 1}/10 cartas
         </span>
         <span className={`block absolute right-5 px-4 py-2 bg-slate-950 rounded-md top-5 text-white text-xs`}>
-          {data ? data.packsOpened : "0"} sobres abiertos
+          {packsOp} sobres abiertos
+        </span>
+        <span className={`block absolute right-1/2 translate-x-1/2 bottom-5 px-4 py-2 bg-slate-950 rounded-md text-white text-xs`}>
+          {totalPacksOp} sobres abiertos en total
         </span>
         <section className={`${isVisible ? "hidden" : "flex"} w-full h-[calc(100vh_-_60px)] justify-center items-center`}>
           <button className={`group relative w-[300px] overflow-hidden h-[500px] bg-image bg-cover bg-center m-10 hover:scale-105 rounded-md transition-all`} style={{ backgroundSize: "100%", backgroundImage: "url(https://cdn.discordapp.com/attachments/756552573431054508/1148384635101909012/Standard_Pack.png)" }} onClick={handleClick}>
@@ -201,6 +223,7 @@ export default function Home() {
                     currentCard={currentCard}
                     index={index}
                     favourites={character.favourites}
+                    pack={packsOp}
                   />
                 </section>
               ))}
@@ -233,7 +256,6 @@ export default function Home() {
       </section >) : (
         <p>Debes iniciar sesión para poder jugar</p>
       )}
-
     </main >
   )
 }

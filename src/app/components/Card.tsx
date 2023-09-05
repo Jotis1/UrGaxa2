@@ -1,4 +1,5 @@
-import Image from "next/image";
+import { useEffect, useState } from "react";
+import { UserAuth } from "../context/AuthContext";
 
 interface CardComponentProps {
     name: string;
@@ -8,10 +9,13 @@ interface CardComponentProps {
     image: string;
     id: number;
     anime?: string;
-    gender: string
+    gender: string;
+    pack?: number
 }
 
-export default function Card({ name, favourites, index, currentCard, image, id, anime, gender }: CardComponentProps) {
+export default function Card({ name, favourites, index, currentCard, image, id, anime, gender, pack }: CardComponentProps) {
+    const { addCharacter, getUserData, addCoins, addCharacterToHistory, checkHistory } = UserAuth();
+    const [favAlert, setFavAlert] = useState(false);
 
     let isHidden;
     if (currentCard != -1) {
@@ -39,16 +43,40 @@ export default function Card({ name, favourites, index, currentCard, image, id, 
     }
     const handleHeartClick = () => {
         if (currentCard != -1) {
-
+            getUserData().then((res: any) => {
+                addCharacterToHistory(id, pack).then(() => {
+                    setFavAlert(true);
+                    if (res.acquiredCharacters.includes(id)) {
+                        checkHistory(id, pack).then((res: any) => {
+                            if (res) {
+                                addCoins(favourites / 3);
+                            }
+                        })
+                    } else {
+                        addCharacter(id);
+                    }
+                })
+            })
         }
-        const favoritos = JSON.parse(localStorage.getItem('favoritos') || '[]');
-        favoritos.push(id);
-        localStorage.setItem('favoritos', JSON.stringify(favoritos));
-        alert('Personaje añadido a favoritos.');
     }
+
+    useEffect(() => {
+        getUserData().then((res: any) => {
+            if (res.acquiredCharacters.includes(id) && currentCard != -1) {
+                setFavAlert(true);
+            } else {
+                setFavAlert(false);
+            }
+        })
+    })
 
     return (
         <section className={`${currentCard == -1 ? "relative" : "absolute"} ${isHidden} w-[300px]  h-[500px] bg-slate-100 rounded-md p-3 shadow-lg ${shadow} border-4 ${bg}  text-slate-950`}>
+            {favAlert && (
+                <section className="absolute -top-[60px] right-0 w-full bg-green-500 text-center rounded-md py-2 text-white text-sm">
+                    <p>Personaje añadido a la colección</p>
+                </section>
+            )}
             <div className="w-full aspect-square bg-slate-200 rounded-md bg-cover bg-image bg-center" style={{ backgroundImage: `url(${image})` }} />
             <p className="text-2xl font-black mt-2 text-center truncate">{name}</p>
             <p className="text-xs p-2 bg-blue-500 text-center mx-auto mt-2 rounded-xl w-full text-white truncate">Anime: <strong>{anime}</strong></p>
