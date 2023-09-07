@@ -3,10 +3,11 @@ import Link from "next/link";
 
 interface NavBarUserButtonComponentProps {
     user: any,
-    logout: any
+    logout: any,
+    isOpened: boolean
 }
 
-export default function NavBarUserButton({ user, logout }: NavBarUserButtonComponentProps) {
+export default function NavBarUserButton({ user, logout, isOpened }: NavBarUserButtonComponentProps) {
     const [isHidden, setIsHidden] = useState(true);
 
     const handleCLick = () => {
@@ -20,14 +21,14 @@ export default function NavBarUserButton({ user, logout }: NavBarUserButtonCompo
     return (
         <section className={`${user ? "block" : "hidden"} relative`}>
             <button className="h-[40px] aspect-square bg-slate-200 rounded-full bg-image bg-cover bg-center" style={{ backgroundImage: `url(${user ? user.profilePicture : ""})` }} onClick={handleCLick}></button>
-            <section className={`text-slate-950 flex-col absolute z-10 rounded-md mt-[15px] right-0 w-[200px] bg-slate-100 text-sm ${isHidden ? "hidden" : "flex"}`} >
-                <div className="p-4 bg-slate-50 rounded-t-md relative">
+            <section className={`text-slate-950 flex-col absolute z-10 rounded-md mt-[15px] ${isOpened ? "left-1/2 -translate-x-1/2" : "right-0"} shadow-md bg-slate-100 w-[200px]  text-sm ${isHidden ? "hidden" : "flex"}`} >
+                <div className="p-4 bg-slate-50 rounded-t-md relative text-start">
                     <p className="font-bold truncate">{user.username}</p>
                     <p className="text-xs truncate">Nivel: {user.level}</p>
                     <span className="bg-green-400 h-1/2 w-2 mx-2 rounded-full absolute top-1/2 -translate-y-1/2 right-0"></span>
                 </div>
                 <section className="flex flex-col p-3">
-                    <Link href="/profile" className="my-2 flex items-center justify-between">Mi perfil <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+                    <Link href={`/profile/${user.uid}`} className="my-2 flex items-center justify-between">Mi perfil <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
                         <path fillRule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z" clipRule="evenodd" />
                     </svg>
                     </Link>

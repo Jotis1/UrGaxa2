@@ -1,7 +1,7 @@
 import { useContext, createContext, useState, useEffect } from "react";
 import { signInWithPopup, signOut, onAuthStateChanged, GoogleAuthProvider } from "firebase/auth";
-import { doc, setDoc, getDoc, updateDoc, arrayUnion, increment, onSnapshot } from "firebase/firestore";
-import { ref, get, onValue } from "firebase/database"
+import { doc, setDoc, getDoc, updateDoc, arrayUnion, increment, onSnapshot, limitToLast } from "firebase/firestore";
+import { query, ref, orderByValue, get, limitToFirst, orderByChild } from "firebase/database";
 import { auth, fsdb, rtdb } from "../firebase";
 
 const AuthContext = createContext();
@@ -48,6 +48,22 @@ export const AuthContextProvider = ({ children }) => {
         signOut(auth)
     };
 
+    /*(async () => {
+        const array = [122434, 60507, 66593, 63272, 59781, 63459, 64445, 495, 43517, 19806, 107019, 62928, 620, 121150, 48631, 52344, 92679, 43042, 12595];
+        const uid = "Zn61yCY8q7P4O6HSeMvkdMil9Iv2";
+        const userDoc = doc(fsdb, `users/${uid}`);
+        const docSnap = await getDoc(userDoc);
+
+        if (docSnap.exists()) {
+            console.log("El documento existe!");
+            updateDoc(userDoc, {
+                acquiredCharacters: array,
+            })
+        } else {
+
+        }
+    })()*/
+
     const getUserData = async () => {
         if (user) {
             const userDoc = doc(fsdb, `users/${user.uid}`);
@@ -92,7 +108,6 @@ export const AuthContextProvider = ({ children }) => {
         });
     };
 
-
     const checkHistory = async (char, p) => {
         const userDoc = doc(fsdb, `users/${user.uid}`);
         const docSnap = await getDoc(userDoc);
@@ -101,7 +116,6 @@ export const AuthContextProvider = ({ children }) => {
             const data = docSnap.data();
             const history = data.history;
             history.forEach(e => {
-                console.log(e.pack, p)
                 if (e.character == char) {
                     if (e.pack == p) {
                         return false;

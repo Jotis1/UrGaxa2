@@ -1,10 +1,12 @@
 "use client";
 import { useEffect, useState } from "react";
-import { UserAuth } from "../context/AuthContext";
+import { UserAuth } from "../../context/AuthContext";
 
-export default function Page() {
+export default function Page({ params }: { params: { slug: string } }) {
     const { user } = UserAuth();
     const [loading, setLoading] = useState(true);
+
+    console.log(params);
 
     useEffect(() => {
         const checkAuth = async () => {
