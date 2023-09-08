@@ -1,34 +1,63 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Bienvenido a YourGacha for Anilist
+>En este repositorio encontrarás todo acerca del proceso de desarrollo de YourGacha, un gacha de personajes anime online.
+***
+## Páginas necesarias
+> Las marcadas con una X son las páginas cuyo diseño ya está terminado.
 
-## Getting Started
+- [ ] Inicio
+- [ ] Registro/Inicio de sesión
+- [ ] Gacha
+- [ ] Resultados del gacha
+- [ ] Colección
+- [ ] Tienda
+- [ ] Perfil del usuario
+- [ ] Configuración
+- [ ] Noticias/Actualizaciones
+- [ ] Soporte/Contacto
+- [ ] Términos y condiciones/Política de Privacidad
+- [ ] FAQ
+- [ ] Invitar a amigos
+- [ ] Foro/Comunidad
+***
+### Tecnologías necesarias
+1. [React](https://es.react.dev/) y [NodeJS](https://nodejs.org/es)
+2. [Firebase](https://firebase.google.com) Database, Storage, Auth, Hosting
+3. [Visual Studio Code](https://code.visualstudio.com/)
+4. [Express.js](https://expressjs.com/es/)
+5. [Tailwind CSS](https://tailwindcss.com/)
+6. [GitHub](https://github.com)
+***
+### Organización de la base de datos
+#### Usuarios
+```typescript
+interface User {
+    uid: string;
+    name: string;
+    email: string;
+    profileImageUrl?: string;
+    acquiredCharacters?: number[];
+    score?: number;
+    level?: number;
+    achievements?: number[];
+    virtualCurrency?: number;
+    registrationDate: Date;
+    gamePreferences?: GamePreferences;
+    transactionHistory?: Transaction[];
+    lastLoginDate?: Date;
+    userStatus?: "online" | "idle" | "dnd";
+}
 
-First, run the development server:
+interface GamePreferences {
+    language: string;
+    notificationsEnabled: boolean;
+    soundVolume: number;
+}
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
+interface Transaction {
+    date: Date;
+    item: string;
+    price: number;
+}
 ```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+#### Personajes
+Los más de 300K personajes están dentro de un archivo JSON
