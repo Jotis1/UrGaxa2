@@ -39,7 +39,7 @@ export default function Card({ name, favourites, index, currentCard, image, id, 
         bg = "border-yellow-500"
     } else {
         shadow = ""
-        bg = "border-slate-100"
+        bg = "border-slate-800"
     }
     const handleHeartClick = () => {
         if (currentCard != -1) {
@@ -71,7 +71,7 @@ export default function Card({ name, favourites, index, currentCard, image, id, 
     })
 
     return (
-        <section className={`${currentCard == -1 ? "relative" : "absolute"} ${isHidden} w-[300px]  h-[500px] bg-slate-100 rounded-md p-3 shadow-lg ${shadow} border-4 ${bg}  text-slate-950`}>
+        <section className={`${currentCard == -1 ? "relative" : "absolute"} ${isHidden} w-[300px]  h-[500px] bg-slate-800 rounded-md p-3 shadow-lg ${shadow} border-4 ${bg}  text-slate-200`}>
             {favAlert && (
                 <section className="absolute -top-[60px] right-0 w-full bg-green-500 text-center rounded-md py-2 text-white text-sm">
                     <p>Personaje añadido a la colección</p>

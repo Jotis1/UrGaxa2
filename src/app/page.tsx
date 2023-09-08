@@ -1,7 +1,7 @@
 "use client";
 
+import { motion, useMotionValue, useAnimation } from "framer-motion";
 import { useState, useEffect } from "react";
-import { onSnapshot, doc } from "firebase/firestore";
 import { UserAuth } from "./context/AuthContext";
 import Card from "./components/Card";
 import { onValue, ref } from "firebase/database";
@@ -45,13 +45,25 @@ interface UserData {
 
 export default function Home() {
   const { user, rtdb, getUserData, addPack, fsdb } = UserAuth();
-  const [data, setData] = useState<UserData | null>(null);
   const [currentCard, setCurrentCard] = useState(0);
   const [isBlocked, setIsBlocked] = useState(false);
   const [status, setStatus] = useState(0);
   const [dumbAlert, setDumbAlert] = useState(false);
   const min = 1;
   const max = 137590;
+  const controls = useAnimation();
+
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+
+  const handleMouseMove = (event: any) => {
+    const { clientX, clientY } = event;
+    const xOffset = (clientX - window.innerWidth / 2) / 20; // Ajusta la velocidad de movimiento en X
+    const yOffset = (clientY - window.innerHeight / 2) / 20; // Ajusta la velocidad de movimiento en Y
+
+    x.set(xOffset);
+    y.set(yOffset);
+  };
 
   function generarArrayAleatorio() {
     let randomNumberArray = [];
@@ -104,18 +116,6 @@ export default function Home() {
   const [isVisible, setIsVisible] = useState(false);
   const [cardContent, setCardContent] = useState([]);
   const [packsOp, setPacksOp] = useState(0);
-  const [totalPacksOp, setTotalPacksOp] = useState(0);
-
-  useEffect(() => {
-    const unsubscribe = onSnapshot(doc(fsdb, `stats/packs`), (doc) => {
-      if (doc.exists()) {
-        const data = doc.data();
-        setTotalPacksOp(data.packsOpened);
-      }
-    });
-    // Devolvemos una función de limpieza para detener la suscripción cuando el componente se desmonta.
-    return () => unsubscribe();
-  }, []);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -124,12 +124,6 @@ export default function Home() {
         setLoading(false)
       })
     }
-    getUserData().then((res: any) => {
-      if (res) {
-        setData(res);
-        setPacksOp(res.packsOpened);
-      }
-    });
     checkAuth();
   }, [user])
 
@@ -198,16 +192,21 @@ export default function Home() {
         <span className={`${isVisible ? "block" : "hidden"} absolute left-5 px-4 py-2 bg-slate-950 rounded-md top-5 text-white text-xs`}>
           {currentCard + 1}/10 cartas
         </span>
-        <span className={`block absolute right-5 px-4 py-2 bg-slate-950 rounded-md top-5 text-white text-xs`}>
-          {packsOp} sobres abiertos
-        </span>
-        <span className={`block absolute right-1/2 translate-x-1/2 bottom-5 px-4 py-2 bg-slate-950 rounded-md text-white text-xs`}>
-          {totalPacksOp} sobres abiertos en total
-        </span>
         <section className={`${isVisible ? "hidden" : "flex"} w-full h-[calc(100vh_-_60px)] justify-center items-center`}>
-          <button className={`group relative w-[300px] overflow-hidden h-[500px] bg-image bg-cover bg-center m-10 hover:scale-105 rounded-md transition-all`} style={{ backgroundSize: "100%", backgroundImage: "url(https://cdn.discordapp.com/attachments/756552573431054508/1148384635101909012/Standard_Pack.png)" }} onClick={handleClick}>
-            <div className="absolute w-[200px] h-[1000px] bg-white top-0 right-0 rotate-45 opacity-20 group-hover:-translate-x-[000px] group-hover:-translate-y-[550px] transition-all blur-md z-10"></div>
-          </button>
+          <motion.div
+            className="bg-slate-800/10 backdrop-blur-sm p-4 border-t border-slate-700 rounded-md shadow-lg"
+            style={{ x, y }}
+            onMouseMove={handleMouseMove}
+          >
+            <button
+              className={`mx-auto group relative w-[300px] overflow-hidden h-[500px] bg-image bg-cover bg-center transition-all`}
+              style={{
+                backgroundImage:
+                  "url(https://cdn.discordapp.com/attachments/756552573431054508/1148384635101909012/Standard_Pack.png)",
+              }}
+              onClick={handleClick}
+            ></button>
+          </motion.div>
         </section>
         <section className={`${isVisible ? "flex" : "hidden"} mt-20  flex-col items-center`}>
           <div className="relative w-[300px] h-[500px]">
@@ -228,28 +227,28 @@ export default function Home() {
                 </section>
               ))}
           </div>
-          <div className={`${isVisible ? "flex" : "hidden"} w-[300px] mx-20 justify-center mt-10 text-slate-950`}>
-            <button className={`p-2 flex justify-center items-center hover:bg-slate-100 rounded-md`} onClick={handlePrevClick}>
+          <div className={`${isVisible ? "flex" : "hidden"} w-[300px] justify-around mt-10 text-slate-200`}>
+            <button className={`p-2 flex justify-center items-center hover:bg-slate-800 rounded-md`} onClick={handlePrevClick}>
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 15.75L3 12m0 0l3.75-3.75M3 12h18" />
               </svg>
             </button>
-            <button className={`p-2 flex justify-center items-center hover:bg-slate-100 rounded-md curso`} onClick={handleNextClick}>
+            <button className={`p-2 flex justify-center items-center hover:bg-slate-800 rounded-md curso`} onClick={handleNextClick}>
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
               </svg>
             </button>
           </div>
         </section>
-        <section className={`${dumbAlert ? "flex" : "hidden"} absolute top-0 w-[100vw] h-[100vh] bg-slate-400/60 z-10  justify-center items-center`}>
-          <div className="w-[500px] h-[300px] bg-slate-100 rounded-md text-center p-5 flex flex-col justify-around">
+        <section className={`${dumbAlert ? "flex" : "hidden"} absolute top-0 w-[100vw] h-[calc(100vh_-_60px)] bg-slate-900/60 z-10  justify-center items-center`}>
+          <div className="w-[500px] h-[300px] bg-slate-900 border border-slate-800 rounded-md text-center p-5 flex flex-col justify-around">
             <div>
-              <p className="text-slate-950 text-3xl font-black">¿Estás seguro de que quieres continuar?</p>
-              <p className="text-sm mt-3 text-slate-600">Los personajes que no hayas reclamado los perderás.</p>
+              <p className="text-slate-200 text-3xl font-black">¿Estás seguro de que quieres continuar?</p>
+              <p className="text-sm mt-3 text-slate-300">Los personajes que no hayas reclamado los perderás.</p>
             </div>
-            <div className="flex justify-around text-white">
-              <button className="w-[100px] py-2 rounded-md bg-green-500  border-green-500 border-2 hover:bg-slate-50 hover:text-green-500 transition-all" onClick={reset}>Sí</button>
-              <button className="w-[100px] py-2 rounded-md bg-red-600  border-red-600 border-2 hover:bg-slate-50 hover:text-red-600 transition-all" onClick={cancelReset}>No</button>
+            <div className="flex justify-between px-10 text-slate-200">
+              <button className="w-[100px] hover:w-[200px] py-2 rounded-md border-green-500 border-2 text-green-500 transition-all" onClick={reset}>Sí</button>
+              <button className="w-[100px] hover:w-[200px] py-2 rounded-md  border-red-500 border-2 text-red-500 transition-all" onClick={cancelReset}>No</button>
             </div>
           </div>
         </section>

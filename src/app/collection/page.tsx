@@ -59,8 +59,8 @@ export default function Collection() {
     return (
         <main>
             <section>
-                <p className="m-5 text-3xl font-extrabold text-slate-950">Colección</p>
-                <section className="w-[1328px] flex flex-wrap justify-start mx-auto">
+                <p className="m-5 text-3xl font-extrabold text-slate-200">Colección</p>
+                <section className="flex flex-wrap max-w-[1328px] mx-auto justify-around">
                     {cardComponents.map((card, index) => (
                         <div key={index} className="flex-none w-[300px] m-4">{card}</div>
                     ))}

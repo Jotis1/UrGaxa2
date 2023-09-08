@@ -14,7 +14,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={`bg-slate-900 ${inter.className}`}>
+        <section className='w-full h-full absolute pattern-dots pattern-bg-transparent pattern-slate-950 pattern-size-6 -z-10'></section>
         <AuthContextProvider>
           <NavBar></NavBar>
           {children}
