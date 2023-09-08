@@ -35,7 +35,8 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "build/types/**/*.ts",
-    "out/types/**/*.ts"
+    "out/types/**/*.ts",
+    "src/app/AppRouter.jsx"
   ],
   "exclude": [
     "node_modules"
