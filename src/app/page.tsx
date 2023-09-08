@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { UserAuth } from "./context/AuthContext";
 import Card from "./components/Card";
 import { onValue, ref } from "firebase/database";
+import { onSnapshot, doc } from "firebase/firestore";
 
 interface CharacterData {
   anime: {
@@ -51,7 +52,7 @@ export default function Home() {
   const [dumbAlert, setDumbAlert] = useState(false);
   const min = 1;
   const max = 137590;
-  const controls = useAnimation();
+  const [data, setData] = useState<UserData | null>(null);
 
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -124,6 +125,12 @@ export default function Home() {
         setLoading(false)
       })
     }
+    getUserData().then((res: any) => {
+      if (res) {
+        setData(res);
+        setPacksOp(res.packsOpened);
+      }
+    });
     checkAuth();
   }, [user])
 
@@ -138,6 +145,19 @@ export default function Home() {
       })
     }
   };
+
+  const [totalPacksOp, setTotalPacksOp] = useState(0);
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(doc(fsdb, `stats/packs`), (doc) => {
+      if (doc.exists()) {
+        const data = doc.data();
+        setTotalPacksOp(data.packsOpened);
+      }
+    });
+    // Devolvemos una función de limpieza para detener la suscripción cuando el componente se desmonta.
+    return () => unsubscribe();
+  }, []);
 
   const handlePrevClick = () => {
     if (currentCard != 0) {
