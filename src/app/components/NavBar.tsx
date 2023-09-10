@@ -51,15 +51,14 @@ export default function NavBar() {
         }
     }
 
+
     useEffect(() => {
-        const checkAuth = async () => {
-            await new Promise((res) => {
-                setTimeout(res, 50);
-                setLoading(false)
-            })
-        }
-        getUserData().then((res: any) => setData(res));
-        checkAuth();
+
+        getUserData().then((res: any) => {
+            setData(res);
+            setLoading(false);
+        });
+
     }, [user])
 
     return (
@@ -138,10 +137,6 @@ export default function NavBar() {
                             </Link>
                             <Link href="#!" className="block relative group min-w-[50px] text-center mx-2">
                                 Tienda
-                                <span className="absolute w-0 group-hover:w-full transition-all h-[2px] bg-slate-200 -bottom-[5px] left-0"></span>
-                            </Link>
-                            <Link href="/collection" className="block relative group min-w-[50px] text-center mx-2">
-                                Colección
                                 <span className="absolute w-0 group-hover:w-full transition-all h-[2px] bg-slate-200 -bottom-[5px] left-0"></span>
                             </Link>
                             <Link href="#!" className="block relative group min-w-[50px] text-center mx-2">

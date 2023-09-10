@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useMotionValue, useAnimation } from "framer-motion";
+import { motion, useMotionValue } from "framer-motion";
 import { useState, useEffect } from "react";
 import { UserAuth } from "./context/AuthContext";
 import Card from "./components/Card";
@@ -122,7 +122,6 @@ export default function Home() {
     const checkAuth = async () => {
       await new Promise((res) => {
         setTimeout(res, 50);
-        setLoading(false)
       })
     }
     getUserData().then((res: any) => {
@@ -186,8 +185,9 @@ export default function Home() {
   useEffect(() => {
     const checkAuth = async () => {
       await new Promise((res) => {
-        setTimeout(res, 50);
-        setLoading(false)
+        setTimeout(() => {
+          setLoading(false)
+        }, 700);
       })
     }
     checkAuth();
@@ -273,7 +273,7 @@ export default function Home() {
           </div>
         </section>
       </section >) : (
-        <section className="text-slate-950 text-center w-[100vw] h-[calc(100vh_-_60px)] flex justify-center items-center">
+        <section className="text-slate-200 text-center w-[100vw] h-[calc(100vh_-_60px)] flex justify-center items-center">
           <p className="text-4xl font-black">Debes iniciar sesión para poder jugar</p>
         </section>
       )}

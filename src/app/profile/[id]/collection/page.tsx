@@ -1,25 +1,21 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { UserAuth } from "../context/AuthContext";
+import { UserAuth } from "../../../context/AuthContext";
+import ProfileLayout from "@/app/components/ProfileLayout";
 
 import { get, ref, onValue } from "firebase/database";
 
-import Card from "../components/Card";
-export default function Collection() {
+import Card from "../../../components/Card";
+export default function Page({ params }: { params: { id: string } }) {
+
     const [cardComponents, setCardComponents] = useState<JSX.Element[]>([]);;
     const { user, getUserData, rtdb } = UserAuth();
-
-    function getAllIDs() {
-        var array = localStorage.getItem("favoritos");
-        if (array) return JSON.parse(array);
-        if (!array) return [];
-    }
 
     useEffect(() => {
         const fetchData = async () => {
             if (user) {
-                let userData = await getUserData();
+                let userData = await getUserData(params.id);
                 let userCharacters = userData.acquiredCharacters;
                 let array: any = [];
                 userCharacters.forEach((e: number) => {
@@ -34,7 +30,7 @@ export default function Collection() {
                                     <Card
                                         image={data.image.large}
                                         gender={data.gender}
-                                        anime={data.anime.title.romaji}
+                                        anime={data.anime ? data.anime.title.romaji : "Título no disponible"}
                                         index={index}
                                         currentCard={-1}
                                         id={data.id}
@@ -57,15 +53,17 @@ export default function Collection() {
 
 
     return (
-        <main>
-            <section>
-                <p className="m-5 text-3xl font-extrabold text-slate-200">Colección</p>
-                <section className="flex flex-wrap max-w-[1328px] mx-auto justify-around">
-                    {cardComponents.map((card, index) => (
-                        <div key={index} className="flex-none w-[300px] m-4">{card}</div>
-                    ))}
+        <ProfileLayout active={4} params={params}>
+            <main>
+                <section>
+                    <p className="m-5 text-3xl font-extrabold text-slate-200">Colección</p>
+                    <section className="flex flex-wrap max-w-[1328px] mx-auto justify-around">
+                        {cardComponents.map((card, index) => (
+                            <div key={index} className="flex-none w-[300px] m-4">{card}</div>
+                        ))}
+                    </section>
                 </section>
-            </section>
-        </main>
+            </main>
+        </ProfileLayout>
     )
 }

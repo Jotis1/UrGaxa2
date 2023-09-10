@@ -14,7 +14,7 @@ interface CardComponentProps {
 }
 
 export default function Card({ name, favourites, index, currentCard, image, id, anime, gender, pack }: CardComponentProps) {
-    const { addCharacter, getUserData, addCoins, addCharacterToHistory, checkHistory } = UserAuth();
+    const { addCharacter, getUserData, addCoins, addCharacterToHistory, checkHistory, user } = UserAuth();
     const [favAlert, setFavAlert] = useState(false);
 
     let isHidden;
@@ -61,14 +61,16 @@ export default function Card({ name, favourites, index, currentCard, image, id, 
     }
 
     useEffect(() => {
-        getUserData().then((res: any) => {
+        const unsubscribe = getUserData().then((res: any) => {
             if (res.acquiredCharacters.includes(id) && currentCard != -1) {
                 setFavAlert(true);
             } else {
                 setFavAlert(false);
             }
         })
-    })
+
+        return () => unsubscribe
+    }, [user])
 
     return (
         <section className={`${currentCard == -1 ? "relative" : "absolute"} ${isHidden} w-[300px]  h-[500px] bg-slate-800 rounded-md p-3 shadow-lg ${shadow} border-4 ${bg}  text-slate-200`}>

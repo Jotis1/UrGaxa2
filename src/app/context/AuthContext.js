@@ -1,7 +1,7 @@
 import { useContext, createContext, useState, useEffect } from "react";
 import { signInWithPopup, signOut, onAuthStateChanged, GoogleAuthProvider } from "firebase/auth";
 import { doc, setDoc, getDoc, updateDoc, arrayUnion, increment, onSnapshot, limitToLast } from "firebase/firestore";
-import { query, ref, orderByValue, get, limitToFirst, orderByChild } from "firebase/database";
+import { query, ref, orderByValue, get, limitToFirst, orderByChild, onValue } from "firebase/database";
 import { auth, fsdb, rtdb } from "../firebase";
 
 const AuthContext = createContext();
@@ -64,16 +64,51 @@ export const AuthContextProvider = ({ children }) => {
         }
     })()*/
 
-    const getUserData = async () => {
-        if (user) {
-            const userDoc = doc(fsdb, `users/${user.uid}`);
-            const docSnap = await getDoc(userDoc);
-            if (docSnap.exists()) {
-                const data = docSnap.data();
-                return data;
+    const getUserData = async (uid) => {
+        try {
+            const userDoc = doc(fsdb, `users/${uid ? uid : user.uid}`);
+            const snap = await getDoc(userDoc);
+
+            if (snap.exists()) {
+                return snap.data()
             } else {
                 return null;
             }
+        } catch (error) {
+            console.error("Error al obtener datos del usuario:", error);
+        }
+    };
+
+    const getCharacterHistory = async (id) => {
+        try {
+            const userDoc = doc(fsdb, `users/${id}`);
+            const snap = await getDoc(userDoc);
+
+            if (snap.exists()) {
+                const userData = snap.data();
+                const history = userData.history.slice(-10); // Obtener solo los últimos 10 elementos del historial
+
+                const characterDataPromises = history.map(async (character) => {
+                    const reference = ref(rtdb, String(character.character));
+                    const snap = await get(reference);
+
+                    if (snap.exists()) {
+                        let data = snap.val();
+                        data.pack = userData.packsOpened - character.pack;
+                        return data;
+                    }
+                });
+
+                const characterDataArray = await Promise.all(characterDataPromises);
+                characterDataArray.sort((a, b) => a.pack - b.pack);
+                return characterDataArray;
+            } else {
+                console.log("El documento de usuario no existe");
+                return [];
+            }
+        } catch (error) {
+            console.error("Error al obtener el historial de personajes:", error);
+            return null;
         }
     }
 
@@ -137,6 +172,20 @@ export const AuthContextProvider = ({ children }) => {
         })
     }
 
+    async function getCharacterById(e) {
+        return new Promise((resolve, reject) => {
+            const charRef = ref(rtdb, String(e));
+            onValue(charRef, (snap) => {
+                if (snap.exists()) {
+                    let data = snap.val();
+                    resolve(data);
+                } else {
+                    reject(new Error(`No se encontraron datos para el personaje ${e}.`));
+                }
+            });
+        });
+    }
+
     const addPack = async (e) => {
         const userDoc = doc(fsdb, `users/${user.uid}`);
         const statsDoc = doc(fsdb, `stats/packs`);
@@ -150,12 +199,33 @@ export const AuthContextProvider = ({ children }) => {
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-            setUser(currentUser);
+            getUserData(currentUser.uid).then((res) => {
+                if (res) {
+                    setUser(res);
+                } else {
+                    setUser(currentUser);
+                }
+            })
         })
         return () => unsubscribe()
-    }, [user])
+    }, [])
 
-    return (<AuthContext.Provider value={{ user, googleSignIn, logOut, getUserData, rtdb, fsdb, addCharacter, addCoins, addCharacterToHistory, checkHistory, addPack, getTotalPacksOpened }}>{children}</AuthContext.Provider>);
+    return (<AuthContext.Provider value={{
+        user,
+        googleSignIn,
+        logOut,
+        getUserData,
+        rtdb,
+        fsdb,
+        addCharacter,
+        addCoins,
+        addCharacterToHistory,
+        checkHistory,
+        addPack,
+        getTotalPacksOpened,
+        getCharacterById,
+        getCharacterHistory
+    }}>{children}</AuthContext.Provider>);
 }
 
 export const UserAuth = () => {
